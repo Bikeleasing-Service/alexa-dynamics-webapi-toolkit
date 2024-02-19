@@ -115,10 +115,28 @@ class SerializationHelper {
                 continue;
             }
 
+            if ($this->isSimpleField($value) && $this->isBikeleasingField($field)) {
+                $translatedData[$field] = $value;
+                // Bikeleasing specific values found, skip the rest of the loop
+                continue;
+            }
+
             $this->client->getLogger()->warning( "No outbound attribute mapping found for {$entity->LogicalName}[{$field}]" );
         }
 
         return $translatedData;
+    }
+
+    // Check if the value could be considered simple (string or integer)
+    private function isSimpleField($value): bool
+    {
+        return is_string($value) || is_int($value);
+    }
+
+    // Check if the field is related to Bikeleasing
+    private function isBikeleasingField($field): bool
+    {
+        return str_starts_with($field, 'asc_') || str_starts_with($field, 'bls_');
     }
 
     /**
